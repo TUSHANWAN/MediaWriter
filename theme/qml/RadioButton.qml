@@ -26,8 +26,8 @@ import org.fedoraproject.AdwaitaTheme 2.0
 T.CheckBox {
     id: control
 
-    implicitWidth: contentItem.implicitWidth + leftPadding + rightPadding
-    implicitHeight: contentItem.implicitHeight + bottomPadding + topPadding
+    implicitWidth: implicitContentWidth + leftPadding + rightPadding + spacing
+    implicitHeight: implicitContentHeight + bottomPadding + topPadding + spacing
 
     padding: theme.checkboxItemSpacing
     spacing: theme.checkboxItemSpacing

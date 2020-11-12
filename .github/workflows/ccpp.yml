@@ -135,7 +135,8 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with:
         cached: ${{ steps.cache-qt.outputs.cache-hit }}
-        arch: win64_mingw73
+        arch: win64_mingw81
+        version: 5.15.1
     - name: Build xz-utils
       shell: bash
       if: ${{ !steps.cache-qt.outputs.cache-hit }}
@@ -169,12 +170,12 @@ jobs:
         sed s@PKGCONFIG\ +=\ adwaita-qt@LIBS\ +=\ -L\$\$[QT_INSTALL_BINS]\ -ladwaitaqt@ -i theme/theme.pro
         mkdir build
         cd build
-        #export PKG_CONFIG_PATH="$Qt5_Dir/lib/pkgconfig/" 
+        #export PKG_CONFIG_PATH="$Qt5_Dir/lib/pkgconfig/"
         #"$Qt5_Dir/bin/qmake" .. "PKG_CONFIG=C:/ProgramData/chocolatey/lib/pkgconfiglite/tools/pkg-config-lite-0.28-1/bin/pkg-config.exe"
-        "$Qt5_Dir/bin/qmake" .. 
+        $Qt5_Dir/bin/qmake ..
         mingw32-make -j2 VERBOSE=1
     - name: Windeployqt
-      if: github.event_name == 'release'
+      if: github.event_name != 'release'
       shell: bash
       run: |
         cd build/app/release
@@ -192,7 +193,7 @@ jobs:
         cp $Qt5_Dir/bin/liblzma.dll .
         cp /c/Program\ Files/OpenSSL/bin/*.dll .
     - name: Installer
-      if: github.event_name == 'release'
+      if: github.event_name != 'release'
       shell: bash
       run: |
         TAG_NAME=$(bash ./dist/get-tag-name.sh)
@@ -216,7 +217,13 @@ jobs:
         unix2dos < "LICENSE.GPL-2" > "build/app/release/LICENSE.GPL-2.txt"
         unix2dos < "LICENSE.LGPL-2" > "build/app/release/LICENSE.LGPL-2.txt"
         makensis -DCERTPATH="" -DCERTPASS="" dist/win/mediawriter_native.tmp.nsi
-        mv dist/win/FMW-setup.exe ./"FedoraMediaWriter-win64-$TAG_NAME.exe"
+        mv dist/win/FMW-setup.exe ./"FedoraMediaWriter-win64.exe"
+    - name: Upload artifacts to GitHub
+      if: github.event_name != 'release'
+      uses: actions/upload-artifact@v2
+      with:
+        name: FedoraMediaWriter-win64.exe
+        path: FedoraMediaWriter-win64.exe
     - name: Upload to GitHub
       if: github.event_name == 'release'
       shell: bash
